@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 python-dotenv = "^1.0.1"
-fastapi = "^0.114.1"
+fastapi = { extras = ["standard"], version = "^0.114.1" }
 pytest = "^8.3.3"
 PyYAML = "^6.0.2"
 uvicorn = { extras = ["standard"], version = "^0.29.0" }
