@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "inhouse-ticket-app"
+version = "0.1.0"
+description = "this is an implementation of inhouse ticketting app"
+authors = ["AVNG <nguyen.vuan@wisseninfotech.com>"]
+license = "AGPL-3.0 license"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-dotenv = "^1.0.1"
+fastapi = "^0.114.1"
+pytest = "^8.3.3"
+PyYAML = "^6.0.2"
+uvicorn = { extras = ["standard"], version = "^0.29.0" }
+
+[tool.poetry.group.dev.dependencies]
+flake9 = "^3.8.3.post2"
+black = "^24.4.2"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 81
+target-version = ['py311']
