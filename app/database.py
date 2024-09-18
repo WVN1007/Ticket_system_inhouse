@@ -1,10 +1,14 @@
 """setup backend database here"""
 
 from sqlalchemy import URL, create_engine
-from sqlalchemy.orm import (sessionmaker, DeclarativeBase, MappedAsDataclass)
-import psycopg
-import time
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, MappedAsDataclass
 from . import settings
+
+
+# create Base object to build tables
+class Base(MappedAsDataclass, DeclarativeBase):
+    """subclassing will be converted to dataclasses"""
+
 
 app_config = settings.app_config
 DB_ENGINE = app_config["DB_ENGINE"]
@@ -27,10 +31,14 @@ url_object = URL.create(
 
 # create engine and sessionLocal for handling database connection
 engine = create_engine(url_object, echo=True)
-sessionLocal = sessionmaker(bind=engine,autoflush=False)
+SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
-# create Base object to build tables
+# create db dependencies to use sesssion
 
-class Base(MappedAsDataclass, DeclarativeBase):
-    '''subclassing will be converted to dataclasses'''
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
