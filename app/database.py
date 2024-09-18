@@ -1,8 +1,10 @@
-'''setup backend database here'''
-from sqlmodel import create_engine,SQLModel
-from sqlalchemy import URL
+"""setup backend database here"""
+
+from sqlalchemy import URL, create_engine
+from sqlalchemy.orm import (sessionmaker, DeclarativeBase, MappedAsDataclass)
 import psycopg
-import settings
+import time
+from . import settings
 
 app_config = settings.app_config
 DB_ENGINE = app_config["DB_ENGINE"]
@@ -12,31 +14,23 @@ DB_HOST = app_config["DB_HOST"]
 DB_NAME = app_config["DB_NAME"]
 DB_PORT = app_config["DB_PORT"]
 
+port = int(DB_PORT)
+
 url_object = URL.create(
     f"postgresql+{DB_ENGINE}",
     username=DB_USERNAME,
     password=DB_PASS,
     host=DB_HOST,
     database=DB_NAME,
-    port=int(DB_PORT)
+    port=port,
 )
 
-# check connection
-while True:
-    try: 
-        conn = psycopg.connect(host=DB_HOST,dbname=DB_NAME,user=DB_USERNAME, password=DB_PASS,port=DB_PORT)
-        print('database is ready for engine to connect')
-        # create our database engine
-        engine = create_engine(url_object,echo=True)
-        break
-    except Exception as error:
-        print('database connection failed')
-        print('error:', error)
+# create engine and sessionLocal for handling database connection
+engine = create_engine(url_object, echo=True)
+sessionLocal = sessionmaker(bind=engine,autoflush=False)
 
+# create Base object to build tables
 
-SQLModel.metadata.create_all(engine)
-
-
-
-
+class Base(MappedAsDataclass, DeclarativeBase):
+    '''subclassing will be converted to dataclasses'''
 
