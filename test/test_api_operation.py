@@ -1,15 +1,19 @@
-'''test api operations with SQL model'''
-from sqlmodel import create_engine, SQLModel
-from sqlalchemy import URL
-from app.main import app
-import os
-from dotenv.load 
-from fastapi.testclient import TestClient
+'''test api functionalities'''
 
-client = TestClient(app)
+from .database_fixture import TestEngine
+from app.db_model import Base
+from sqlalchemy import MetaData
 
+meta = MetaData()
 
-# connect to the database
+def test_database_tables_creation():
+    """test if all the tables are created"""
 
-def test_create_ticket():
-    """ test for creating a ticket""" 
+    Base.metadata.drop_all(bind=TestEngine)
+    Base.metadata.create_all(bind=TestEngine)
+    meta.reflect(bind=TestEngine)
+    tables_test_dict = meta.tables.keys()
+    assert "ticket_table" in tables_test_dict
+    assert "attachment_table" in tables_test_dict
+    assert "dev_table" in tables_test_dict
+    assert "user_table" in tables_test_dict
