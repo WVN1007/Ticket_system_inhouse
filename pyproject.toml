@@ -18,6 +18,7 @@ sqlalchemy = "^2.0.34"
 sqlmodel = "^0.0.22"
 pg8000 = "^1.31.2"
 psycopg = { extras = ["binary"], version = "^3.2.2" }
+alembic = "^1.13.2"
 
 [tool.poetry.group.dev.dependencies]
 flake9 = "^3.8.3.post2"
