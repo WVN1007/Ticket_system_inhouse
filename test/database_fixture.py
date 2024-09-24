@@ -28,7 +28,10 @@ url_object = URL.create(
 )
 
 TestEngine = create_engine(url_object)
-TestingSessionLocal = sessionmaker(autoflush=False, bind=TestEngine)
+TestingSessionLocal = sessionmaker(
+    autoflush=False, bind=TestEngine, autocommit=False
+)
+
 
 @pytest.fixture()
 def session():
@@ -43,16 +46,34 @@ def session():
     finally:
         db.close()
 
+
 @pytest.fixture()
 def client(session):
-    '''return a TestClient instant with all our fixtures'''
+    """return a TestClient instant with all our fixtures"""
+
     def override_get_db():
         try:
             # we run our sessions() method before each sessions
-            yield session # yield the session artefacts
+            yield session  # yield the session artefacts
         finally:
             session.close()
-    
+
     # override our get_db dependencies
-    app.dependency_overrides[get_db]=override_get_db
+    app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
+
+
+@pytest.fixture()
+def test_user(client):
+    user = {
+        "username": "User1 no fixture",
+        "role": "USER",
+        "email": "Fixturetester1@example.com",
+        "password": "VeryFixSecure",
+        "tickets": [],
+    }
+    res = client.post("/api/users", json=user)
+    assert res.status_code == 201
+    new_user = res.json()
+    new_user["password"] = user["password"]
+    return new_user
