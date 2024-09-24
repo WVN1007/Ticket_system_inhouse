@@ -1,6 +1,8 @@
 """Tests for CRUD of Users and Devs"""
-from .database_fixture import session, client
-from app import schemas
+
+from .database_fixture import session, client, test_user
+from app import schemas, db_model
+from requests import HTTPError
 
 
 def test_create_users(client):
@@ -11,11 +13,48 @@ def test_create_users(client):
             "role": "USER",
             "email": "tester@example.com",
             "password": "VerySecure",
-            "tickets": []
+            "tickets": [],
         },
     )
     res_dict = {**res.json()}
-    print("::response returned from api: ",res_dict)
+    print("::response returned from api: ", res_dict)
     new_user = schemas.UserOut(**res.json())
     assert res.status_code == 201
     assert new_user.email == "tester@example.com"
+
+
+def test_get_user(session, client, test_user):
+    data = [
+        {
+            "username": "User1 no Tester",
+            "role": "USER",
+            "email": "tester1@example.com",
+            "password": "VerySecure",
+            "tickets": [],
+        },
+        {
+            "username": "User2 no Tester",
+            "role": "USER",
+            "email": "tester2@example.com",
+            "password": "VerySecure",
+            "tickets": [],
+        },
+    ]
+
+    def make_User_model(user_data):
+        return db_model.User(**user_data)
+
+    mapped_user = map(make_User_model, data)
+    user_list = list(mapped_user)
+    session.add_all(user_list)
+    session.commit()
+
+    res = client.get("/api/users")
+    users_detail = res.json()
+    assert isinstance(users_detail, dict)  # assert returns is a dictionary
+    assert isinstance(
+        users_detail["details"], list
+    )  # assert a list value in 'details' key
+    assert (
+        len(users_detail["details"]) == 3
+    )  # assert messages contains 3 users in a lists
