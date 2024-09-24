@@ -6,7 +6,8 @@ from .database import Base
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import Optional               
+from typing import Optional, List
+
 
 # set Enum classes
 class Status(enum.Enum):
@@ -51,13 +52,18 @@ class Ticket(Base):
     # one to many relationship with User
     # when a user is deleted, the ticket still persits
     # but the owner will be set to 'NULL'
-    owner_id: Mapped[str] = mapped_column(ForeignKey("user_table.uid",ondelete="SET NULL"))
-    owner: Mapped["User"] = relationship(back_populates="tickets")
-    
+    owner_id: Mapped[UUID] = mapped_column(
+        ForeignKey("user_table.uid", ondelete="SET NULL")
+    )
+    owner: Mapped["User"] = relationship("User", back_populates="tickets")
     # one to one with dev staffs
     # but set it as optional to indicate we can designate or not
-    assign_to_id: Mapped[Optional[str]] = mapped_column(ForeignKey("dev_table.uid",ondelete="SET NULL"))
-    assign_to: Mapped[Optional["Dev"]] = relationship(back_populates="assigned_tickets")
+    assign_to_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("dev_table.uid", ondelete="SET NULL")
+    )
+    assign_to: Mapped[Optional["Dev"]] = relationship(
+        back_populates="assigned_tickets"
+    )
 
     uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
     create_date: Mapped[datetime] = mapped_column(
@@ -80,8 +86,13 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(16), unique=True)
     role: Mapped[UserRole]
     # many to one relationship with ticket
-    tickets: Mapped[list["Ticket"]] = relationship(back_populates="owner",cascade="all, delete",passive_deletes=True)
-
+    tickets: Mapped[List["Ticket"]] = relationship(
+        "Ticket",
+        back_populates="owner",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+    password: Mapped[str]
     email: Mapped[str] = mapped_column(
         String,
         default="example@example.com",
@@ -100,8 +111,10 @@ class Dev(Base):
         String(16),
         unique=True,
     )
-    #set relationship with tickets
-    assigned_tickets: Mapped[Optional[list["Ticket"]]] = relationship(back_populates="assign_to")
+    # set relationship with tickets
+    assigned_tickets: Mapped[Optional[List["Ticket"]]] = relationship(
+        back_populates="assign_to"
+    )
     role: Mapped[DevRole]
     email: Mapped[str] = mapped_column(String, unique=True)
     uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
