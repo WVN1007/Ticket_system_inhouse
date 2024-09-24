@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from app import schemas, utils
 from app.database import get_db
 import app.db_model as models
@@ -29,9 +30,17 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/users/")
-async def read_users():
+async def read_users(db: Session = Depends(get_db)):
     """Get all users, NOTE: ADMIN only"""
-    return [{"user.id": "IDEXAMPLE123"}]
+    users = db.execute(select(models.User)).scalars().all()
+
+    # serialize result in a dictionary type
+    string_user = list(str(user) for user in users)
+    mapped_users = map(utils.serialize, list(string_user))
+
+    re = {}
+    re["details"] = list(mapped_users)
+    return re
 
 
 @router.get("/users/me")
