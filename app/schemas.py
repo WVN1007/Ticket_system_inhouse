@@ -3,7 +3,7 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from typing import Literal, List
-from uuid import UUID
+import uuid
 
 
 class UserOut(BaseModel):
@@ -12,7 +12,7 @@ class UserOut(BaseModel):
     username: str
     role: str
     email: EmailStr
-    uid: UUID
+    uid: uuid.UUID
     tickets: List
 
 
@@ -39,7 +39,7 @@ class DevOut(BaseModel):
     username: str
     role: str
     email: EmailStr
-    uid: UUID
+    uid: uuid.UUID
     # tickets: List
 
 
@@ -71,11 +71,11 @@ class TicketCreate(TicketBase):
 
 
 class Ticket(TicketBase):
-    uid: str
+    uid: uuid.UUID
     create_at: datetime
-    owner_id: UUID
+    owner_id: uuid.UUID
     owner: UserOut
-    assign_to_id: UUID
+    assign_to_id: uuid.UUID
     assign_to: DevOut
 
 
