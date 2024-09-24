@@ -4,8 +4,8 @@ import enum
 from sqlalchemy import ForeignKey, String
 from .database import Base
 from datetime import datetime, timezone
-from uuid import UUID, uuid4
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+import uuid
 from typing import Optional, List
 
 
@@ -52,7 +52,7 @@ class Ticket(Base):
     # one to many relationship with User
     # when a user is deleted, the ticket still persits
     # but the owner will be set to 'NULL'
-    owner_id: Mapped[UUID] = mapped_column(
+    owner_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user_table.uid", ondelete="SET NULL")
     )
     owner: Mapped["User"] = relationship("User", back_populates="tickets")
@@ -65,7 +65,9 @@ class Ticket(Base):
         back_populates="assigned_tickets"
     )
 
-    uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
+    uid: Mapped[uuid.UUID] = mapped_column(
+        default_factory=uuid.uuid4, primary_key=True
+    )
     create_date: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
@@ -93,12 +95,15 @@ class User(Base):
         passive_deletes=True,
     )
     password: Mapped[str]
+    uid: Mapped[uuid.UUID] = mapped_column(
+        default_factory=uuid.uuid4,
+        primary_key=True,
+    )
     email: Mapped[str] = mapped_column(
         String,
         default="example@example.com",
         unique=True,
     )
-    uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
 
     def __repr__(self) -> str:
         return f"User(id={self.uid!r},role={self.role!r},username={self.username!r},email={self.email!r})"
@@ -117,7 +122,9 @@ class Dev(Base):
     )
     role: Mapped[DevRole]
     email: Mapped[str] = mapped_column(String, unique=True)
-    uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
+    uid: Mapped[str] = mapped_column(
+        default_factory=uuid.uuid4, primary_key=True
+    )
 
     def __repr__(self) -> str:
         return f"Dev(id={self.uid!r},role={self.role!r},username={self.username!r},email={self.email!r})"
@@ -131,7 +138,9 @@ class Attachment(Base):
     upload_date: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
-    uid: Mapped[UUID] = mapped_column(default=uuid4().hex, primary_key=True)
+    uid: Mapped[uuid.UUID] = mapped_column(
+        default_factory=uuid.uuid4, primary_key=True
+    )
 
     def __repr__(self) -> str:
         return f"Attachment(id={self.uid!r},Upload_date={self.upload_date!r},name={self.name!r},path={self.path!r})"
