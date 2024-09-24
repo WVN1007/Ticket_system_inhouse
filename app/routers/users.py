@@ -6,6 +6,7 @@ from sqlalchemy import select
 from app import schemas, utils
 from app.database import get_db
 import app.db_model as models
+import uuid
 
 router = APIRouter(
     prefix="/api", tags=["users"], responses={404: {"description": "Not found"}}
@@ -29,18 +30,18 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.get("/users/")
+@router.get("/users/", response_model=list[schemas.UserOut])
 async def read_users(db: Session = Depends(get_db)):
     """Get all users, NOTE: ADMIN only"""
     users = db.execute(select(models.User)).scalars().all()
-
+    return users
     # serialize result in a dictionary type
-    string_user = list(str(user) for user in users)
-    mapped_users = map(utils.serialize, list(string_user))
-
-    re = {}
-    re["details"] = list(mapped_users)
-    return re
+    # string_user = list(str(user) for user in users)
+    # mapped_users = map(utils.serialize, list(string_user))
+    #
+    # re = {}
+    # re["details"] = list(mapped_users)
+    # return re
 
 
 @router.get("/users/me")
@@ -50,5 +51,7 @@ async def read_current_user():
 
 
 @router.get("/users/{uid}")
-async def read_user(uid: str):
-    return {f"{uid}": "fake_uid", "fake": "fasle user"}
+async def read_user(uid: str, db: Session = Depends(get_db)):
+    id = uuid.UUID(uid)
+    user = db.execute(select(models.User).filter_by(uid=id)).scalar_one()
+    return user

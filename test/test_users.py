@@ -51,10 +51,5 @@ def test_get_user(session, client, test_user):
 
     res = client.get("/api/users")
     users_detail = res.json()
-    assert isinstance(users_detail, dict)  # assert returns is a dictionary
-    assert isinstance(
-        users_detail["details"], list
-    )  # assert a list value in 'details' key
-    assert (
-        len(users_detail["details"]) == 3
-    )  # assert messages contains 3 users in a lists
+    assert isinstance(users_detail, list)
+    assert len(users_detail) == 3
