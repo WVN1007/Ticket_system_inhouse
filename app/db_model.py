@@ -79,7 +79,7 @@ class Ticket(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Ticket(id={self.uid!r},type={self.typ!r},status={self.status!r},state={self.state!r},last_update={self.update_date!r},description={self.description!r})"
+        return f"TICKET(id={self.uid!r},type={self.typ!r},status={self.status!r},state={self.state!r},last_update={self.update_date!r},description={self.description!r})"
 
 
 class User(Base):
@@ -106,7 +106,7 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        return f"User(id={self.uid!r},role={self.role!r},username={self.username!r},email={self.email!r})"
+        return f"Table=User,id={self.uid.hex},role={self.role.value},username={self.username!r},email={self.email!r}"
 
 
 class Dev(Base):
