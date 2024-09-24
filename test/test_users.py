@@ -23,7 +23,7 @@ def test_create_users(client):
     assert new_user.email == "tester@example.com"
 
 
-def test_get_user(session, client, test_user):
+def test_get_users(session, client, test_user):
     data = [
         {
             "username": "User1 no Tester",
@@ -53,3 +53,11 @@ def test_get_user(session, client, test_user):
     users_detail = res.json()
     assert isinstance(users_detail, list)
     assert len(users_detail) == 3
+
+
+def test_get_single_users(client, test_user):
+    res = client.get(f"/api/users/{test_user['uid']}")
+    assert res.status_code == 200
+    user = res.json()
+    assert user['uid'] == test_user['uid']
+    assert user['email'] == test_user['email']
