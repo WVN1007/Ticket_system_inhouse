@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import URL, create_engine
+from starlette.types import StatefulLifespan
 from app.database import app_config, get_db, Base
 from app.main import app
 
@@ -77,3 +78,18 @@ def test_user(client):
     new_user = res.json()
     new_user["password"] = user["password"]
     return new_user
+
+@pytest.fixture()
+def test_dev(client):
+    staff = {
+        "username": "Sta1 no fixture",
+        "role": "STAFF",
+        "email": "FixtureStaff1@example.com",
+        "password": "VeryStaffFixSecure",
+        "assigned_tickets": [],
+    }
+    res = client.post("/api/devs", json=staff)
+    assert res.status_code == 201
+    new_staff = res.json()
+    new_staff["password"] = staff["password"]
+    return new_staff

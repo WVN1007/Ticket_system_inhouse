@@ -116,18 +116,19 @@ class Dev(Base):
         String(16),
         unique=True,
     )
+    password: Mapped[str]
     # set relationship with tickets
-    assigned_tickets: Mapped[Optional[List["Ticket"]]] = relationship(
+    assigned_tickets: Mapped[List["Ticket"]] = relationship(
         back_populates="assign_to"
     )
     role: Mapped[DevRole]
     email: Mapped[str] = mapped_column(String, unique=True)
-    uid: Mapped[str] = mapped_column(
+    uid: Mapped[uuid.UUID] = mapped_column(
         default_factory=uuid.uuid4, primary_key=True
     )
 
     def __repr__(self) -> str:
-        return f"Dev(id={self.uid!r},role={self.role!r},username={self.username!r},email={self.email!r})"
+        return f"Table=Dev,id={self.uid.hex},role={self.role.value},username={self.username!r},email={self.email!r}"
 
 
 class Attachment(Base):

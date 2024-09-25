@@ -36,11 +36,18 @@ async def read_users(db: Session = Depends(get_db)):
     users = db.execute(select(models.User)).scalars().all()
     return users
 
-@router.get("/users/me")
-async def read_current_user():
-    """Get current logged in user"""
-    return {"myuid": "my fakeuid"}
 
+# TODO: add method to get current user data
+# @router.get("/users/me")
+# async def read_current_user():
+#     """Get current logged in user"""
+#     return {"myuid": "my fakeuid"}
+
+
+# TODO: add method to update user data
+# @router.put("/users/{id}")
+# asycdef update_user_w_id():
+# '''update the user with put method'''
 
 @router.get("/users/{uid}", response_model=schemas.UserOut)
 async def read_user(uid: str, db: Session = Depends(get_db)):

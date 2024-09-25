@@ -40,16 +40,17 @@ class DevOut(BaseModel):
     role: str
     email: EmailStr
     uid: uuid.UUID
-    # tickets: List
+    assigned_tickets: List
 
 
 class DevCreate(BaseModel):
     """Devs data for create a new dev"""
 
     username: str
-    role: Literal["staff", "admin"]
+    role: Literal["STAFF", "ADMIN"]
     email: EmailStr
-
+    password: str
+    assigned_tickets: List[None]
 
 class DevLogin(BaseModel):
     """Devs login pydantic models"""
