@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel, EmailStr , Field
-from typing import Literal, List
+from typing import Literal, List, Optional
 import uuid
 
 
@@ -13,7 +13,7 @@ class UserOut(BaseModel):
     role: str
     email: EmailStr
     uid: uuid.UUID
-    tickets: List
+    tickets: Optional[list] = []
 
 class UserUpdate(BaseModel):
     """User data just for updates"""
@@ -28,7 +28,7 @@ class UserCreate(BaseModel):
     role: Literal["USER", "ADMIN"]
     email: EmailStr
     password: str
-    tickets: List[None]
+    tickets: Optional[list]= []
 
 
 class UserLogin(BaseModel):
@@ -45,7 +45,7 @@ class DevOut(BaseModel):
     role: str
     email: EmailStr
     uid: uuid.UUID
-    assigned_tickets: List
+    assigned_tickets: Optional[list] = []
 
 
 class DevCreate(BaseModel):
@@ -55,7 +55,7 @@ class DevCreate(BaseModel):
     role: Literal["STAFF", "ADMIN"]
     email: EmailStr
     password: str
-    assigned_tickets: List[None]
+    assigned_tickets: List[None] = []
 
 class DevLogin(BaseModel):
     """Devs login pydantic models"""
@@ -84,8 +84,8 @@ class Ticket(TicketBase):
     create_at: datetime
     owner_id: uuid.UUID
     owner: UserOut
-    assign_to_id: uuid.UUID
-    assign_to: DevOut
+    assign_to_id: uuid.UUID | None = None
+    assign_to: DevOut | None = None
 
 
 class TicketOut(BaseModel):
