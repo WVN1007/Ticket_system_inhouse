@@ -65,7 +65,7 @@ class Ticket(Base):
         back_populates="assigned_tickets"
     )
 
-    uid: Mapped[uuid.UUID] = mapped_column(
+    uid:Mapped[uuid.UUID] = mapped_column(
         default_factory=uuid.uuid4, primary_key=True
     )
     create_date: Mapped[datetime] = mapped_column(

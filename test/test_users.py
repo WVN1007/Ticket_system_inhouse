@@ -2,8 +2,7 @@
 
 from .database_fixture import session, client, test_user
 from app import schemas, db_model
-from requests import HTTPError
-
+import uuid
 
 def test_create_users(client):
     res = client.post(
@@ -61,3 +60,26 @@ def test_get_single_users(client, test_user):
     user = res.json()
     assert user['uid'] == test_user['uid']
     assert user['email'] == test_user['email']
+
+def test_update_single_users(client, test_user):
+    id = str(test_user['uid'])
+    ud = {
+        "username":test_user['username'],
+        "role": "ADMIN",
+        "email": test_user['email'], 
+    }
+    res = client.put(f"/api/users/{id}", json=ud)
+    assert res.status_code == 200
+    assert res.json()['role'] == 'admin'
+
+
+def test_delete_single_user(client,test_user):
+    id = str(test_user['uid'])
+    res = client.delete(f"/api/users/{id}")
+    assert res.status_code == 204
+    res = client.get(f"/api/users/{id}")
+    assert res.status_code == 404
+    fake_id = uuid.uuid4().hex
+    res = client.delete(f"/api/users/{fake_id}")
+    assert res.status_code == 404
+    res = res.status_code

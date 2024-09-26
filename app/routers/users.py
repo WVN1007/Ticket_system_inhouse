@@ -1,10 +1,11 @@
 """Router to Users data"""
 
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 from app import schemas, utils
 from app.database import get_db
+
 import app.db_model as models
 import uuid
 
@@ -37,20 +38,53 @@ async def read_users(db: Session = Depends(get_db)):
     return users
 
 
+# TODO: add authentication method
+
+
 # TODO: add method to get current user data
 # @router.get("/users/me")
 # async def read_current_user():
 #     """Get current logged in user"""
 #     return {"myuid": "my fakeuid"}
 
+# TODO: add authorization
+@router.put("/users/{id}", response_model=schemas.UserOut)
+async def update_user_w_id(
+    id: str, update_user: schemas.UserUpdate, db: Session = Depends(get_db)
+):
+    """update the user with put method"""
+    try:
+        uid = uuid.UUID(id)
+        user = db.execute(select(models.User).filter_by(uid=uid)).scalar_one_or_none()
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        update_dict = dict(update_user)
+        db.execute(update(models.User).where(models.User.uid==uid).values(**update_dict))
+        db.commit()
+        db.refresh(user)
+    except Exception as e:
+        raise e
+    return user
 
-# TODO: add method to update user data
-# @router.put("/users/{id}")
-# asycdef update_user_w_id():
-# '''update the user with put method'''
+
+# TODO: add authorization
+@router.delete("/users/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_user(id:str, db: Session = Depends(get_db)):
+    '''Delete a User in the database: UNSAFE'''
+    uid = uuid.UUID(id)
+    user = db.execute(select(models.User).filter_by(uid=uid)).scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    db.execute(delete(models.User).where(models.User.uid==uid))
+    db.commit()
+    return {"msg":"UserDeleted"}
 
 @router.get("/users/{uid}", response_model=schemas.UserOut)
 async def read_user(uid: str, db: Session = Depends(get_db)):
     id = uuid.UUID(uid)
-    user = db.execute(select(models.User).filter_by(uid=id)).scalar_one()
+    user = db.execute(select(models.User).filter_by(uid=id)).scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return user

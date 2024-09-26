@@ -1,7 +1,7 @@
 """schema validation using pydantic"""
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr , Field
 from typing import Literal, List
 import uuid
 
@@ -15,6 +15,11 @@ class UserOut(BaseModel):
     uid: uuid.UUID
     tickets: List
 
+class UserUpdate(BaseModel):
+    """User data just for updates"""
+    username: str
+    role: str
+    email: EmailStr
 
 class UserCreate(BaseModel):
     """User data for create a new user"""
@@ -58,6 +63,9 @@ class DevLogin(BaseModel):
     email: EmailStr
     password: str
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str = Field(default="Bearer")
 
 class TicketBase(BaseModel):
     typ: Literal["INC", "RITM"]
