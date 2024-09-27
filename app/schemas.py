@@ -27,7 +27,7 @@ class UserCreate(BaseModel):
     username: str
     role: Literal["USER", "ADMIN"]
     email: EmailStr
-    password: str
+    password: str | bytes
     tickets: Optional[list]= []
 
 
@@ -54,7 +54,7 @@ class DevCreate(BaseModel):
     username: str
     role: Literal["STAFF", "ADMIN"]
     email: EmailStr
-    password: str
+    password: str | bytes
     assigned_tickets: List[None] = []
 
 class DevLogin(BaseModel):
