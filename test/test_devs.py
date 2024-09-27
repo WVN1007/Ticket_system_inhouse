@@ -1,7 +1,7 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client,test_dev
-from app import schemas, db_model
+from app import schemas, db_model, utils
 
 
 def test_create_devs(client):
@@ -28,14 +28,14 @@ def test_get_staffs(session, client, test_dev):
             "username": "Staff1 no Test",
             "role": "STAFF",
             "email": "Staffmem1@example.com",
-            "password": "VeryStaffSecure",
+            "password": utils.hash_pwd('VeryStaffSecure'),
             "assigned_tickets": [],
         },
         {
             "username": "Staff2 no Test",
             "role": "STAFF",
             "email": "Staffmem2@example.com",
-            "password": "VeryStaffSecure",
+            "password": utils.hash_pwd("VeryStaffSecure"),
             "assigned_tickets": [],
         },
     ]

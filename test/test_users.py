@@ -1,7 +1,7 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client, test_user
-from app import schemas, db_model
+from app import schemas, db_model, utils
 import uuid
 
 def test_create_users(client):
@@ -12,7 +12,7 @@ def test_create_users(client):
             "role": "USER",
             "email": "tester@example.com",
             "password": "VerySecure",
-            "tickets": [],
+            # "tickets": [],
         },
     )
     res_dict = {**res.json()}
@@ -28,14 +28,14 @@ def test_get_users(session, client, test_user):
             "username": "User1 no Tester",
             "role": "USER",
             "email": "tester1@example.com",
-            "password": "VerySecure",
+            "password": utils.hash_pwd('VerySecure'),
             "tickets": [],
         },
         {
             "username": "User2 no Tester",
             "role": "USER",
             "email": "tester2@example.com",
-            "password": "VerySecure",
+            "password": utils.hash_pwd('VerySecure'),
             "tickets": [],
         },
     ]
