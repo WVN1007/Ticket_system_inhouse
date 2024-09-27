@@ -29,7 +29,7 @@ class State(enum.Enum):
 
 class Typ(enum.Enum):
     INC = "INC"
-    RITM = "RITM"
+    RITM = "RITM" # change in SR 
 
 
 class UserRole(enum.Enum):
@@ -52,17 +52,18 @@ class Ticket(Base):
     # one to many relationship with User
     # when a user is deleted, the ticket still persits
     # but the owner will be set to 'NULL'
-    owner_id: Mapped[uuid.UUID] = mapped_column(
+    owner_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("user_table.uid", ondelete="SET NULL")
     )
-    owner: Mapped["User"] = relationship("User", back_populates="tickets")
+    owner: Mapped[Optional["User"]] = relationship("User", back_populates="tickets")
     # one to one with dev staffs
     # but set it as optional to indicate we can designate or not
-    assign_to_id: Mapped[Optional[str]] = mapped_column(
+    assign_to_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("dev_table.uid", ondelete="SET NULL")
     )
-    assign_to: Mapped[Optional["Dev"]] = relationship(
-        back_populates="assigned_tickets"
+    assign_to: Mapped["Dev"] = relationship(
+        back_populates="assigned_tickets",
+        foreign_keys=[assign_to_id]
     )
 
     uid:Mapped[uuid.UUID] = mapped_column(
@@ -88,13 +89,14 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(16), unique=True)
     role: Mapped[UserRole]
     # many to one relationship with ticket
-    tickets: Mapped[List["Ticket"]] = relationship(
+    tickets: Mapped[Optional[List["Ticket"]]] = relationship(
         "Ticket",
         back_populates="owner",
         cascade="all, delete",
         passive_deletes=True,
+
     )
-    password: Mapped[str]
+    password: Mapped[bytes]
     uid: Mapped[uuid.UUID] = mapped_column(
         default_factory=uuid.uuid4,
         primary_key=True,
@@ -116,7 +118,7 @@ class Dev(Base):
         String(16),
         unique=True,
     )
-    password: Mapped[str]
+    password: Mapped[bytes]
     # set relationship with tickets
     assigned_tickets: Mapped[List["Ticket"]] = relationship(
         back_populates="assign_to"
