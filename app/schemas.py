@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel, EmailStr , Field
-from typing import Literal, List, Optional
+from typing import Literal, List, Optional, Union
 import uuid
 
 
@@ -27,7 +27,7 @@ class UserCreate(BaseModel):
     username: str
     role: Literal["USER", "ADMIN"]
     email: EmailStr
-    password: str | bytes
+    password: Union[str, bytes]
     tickets: Optional[list]= []
 
 
@@ -54,7 +54,7 @@ class DevCreate(BaseModel):
     username: str
     role: Literal["STAFF", "ADMIN"]
     email: EmailStr
-    password: str | bytes
+    password: Union[str,bytes]
     assigned_tickets: List[None] = []
 
 class DevLogin(BaseModel):
