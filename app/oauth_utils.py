@@ -25,11 +25,11 @@ def get_user(usr: str, db: Session):
     if user_data is None:
         return None
     user = schemas.UserOut(
-        username=user_data.username, 
-        email=user_data.email, 
+        username=user_data.username,
+        email=user_data.email,
         uid=user_data.uid,
         role=user_data.role.__str__(),
-        tickets=user_data.tickets
+        tickets=user_data.tickets,
     )
     return user
 
@@ -70,7 +70,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encode_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     """get current user and check token validation"""
     # return exception
     credential_exception = HTTPException(

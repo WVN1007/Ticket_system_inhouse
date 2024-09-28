@@ -29,7 +29,7 @@ class State(enum.Enum):
 
 class Typ(enum.Enum):
     INC = "INC"
-    RITM = "RITM" # change in SR 
+    RITM = "RITM"  # change in SR
 
 
 class UserRole(enum.Enum):
@@ -55,18 +55,19 @@ class Ticket(Base):
     owner_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("user_table.uid", ondelete="SET NULL")
     )
-    owner: Mapped[Optional["User"]] = relationship("User", back_populates="tickets")
+    owner: Mapped[Optional["User"]] = relationship(
+        "User", back_populates="tickets"
+    )
     # one to one with dev staffs
     # but set it as optional to indicate we can designate or not
     assign_to_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("dev_table.uid", ondelete="SET NULL")
     )
     assign_to: Mapped["Dev"] = relationship(
-        back_populates="assigned_tickets",
-        foreign_keys=[assign_to_id]
+        back_populates="assigned_tickets", foreign_keys=[assign_to_id]
     )
 
-    uid:Mapped[uuid.UUID] = mapped_column(
+    uid: Mapped[uuid.UUID] = mapped_column(
         default_factory=uuid.uuid4, primary_key=True
     )
     create_date: Mapped[datetime] = mapped_column(
@@ -94,7 +95,6 @@ class User(Base):
         back_populates="owner",
         cascade="all, delete",
         passive_deletes=True,
-
     )
     password: Mapped[bytes]
     uid: Mapped[uuid.UUID] = mapped_column(

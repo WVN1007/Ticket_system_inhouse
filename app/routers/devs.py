@@ -22,7 +22,7 @@ async def create_user(dev: schemas.DevCreate, db: Session = Depends(get_db)):
     """create a new dev"""
     hashed_pwd = utils.hash_pwd(dev.password)
     dev.password = hashed_pwd
-    new_staff= models.Dev(**dev.model_dump())
+    new_staff = models.Dev(**dev.model_dump())
 
     db.add(new_staff)
     db.commit()
@@ -35,6 +35,7 @@ async def read_devs(db: Session = Depends(get_db)):
     """Get all devs, NOTE: ADMIN only"""
     staffs = db.execute(select(models.Dev)).scalars().all()
     return staffs
+
 
 # TODO: add method to get current login staff data
 # @router.get("/devs/me")
