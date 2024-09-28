@@ -1,7 +1,7 @@
 """schema validation using pydantic"""
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr , Field
+from pydantic import BaseModel, EmailStr, Field
 from typing import Literal, List, Optional, Union
 import uuid
 
@@ -15,11 +15,14 @@ class UserOut(BaseModel):
     uid: uuid.UUID
     tickets: Optional[list] = []
 
+
 class UserUpdate(BaseModel):
     """User data just for updates"""
+
     username: str
     role: str
     email: EmailStr
+
 
 class UserCreate(BaseModel):
     """User data for create a new user"""
@@ -28,14 +31,15 @@ class UserCreate(BaseModel):
     role: Literal["USER", "ADMIN"]
     email: EmailStr
     password: Union[str, bytes]
-    tickets: Optional[list]= []
+    tickets: Optional[list] = []
 
 
-class UserLogin(BaseModel):
-    """User login models"""
+class UserLoggedIn(BaseModel):
+    """User logged in with Tojen"""
 
+    username: str
     email: EmailStr
-    password: str
+    uid: uuid.UUID
 
 
 class DevOut(BaseModel):
@@ -54,8 +58,9 @@ class DevCreate(BaseModel):
     username: str
     role: Literal["STAFF", "ADMIN"]
     email: EmailStr
-    password: Union[str,bytes]
+    password: Union[str, bytes]
     assigned_tickets: List[None] = []
+
 
 class DevLogin(BaseModel):
     """Devs login pydantic models"""
@@ -63,9 +68,15 @@ class DevLogin(BaseModel):
     email: EmailStr
     password: str
 
+
 class Token(BaseModel):
     access_token: str
-    token_type: str = Field(default="Bearer")
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
 
 class TicketBase(BaseModel):
     typ: Literal["INC", "RITM"]
