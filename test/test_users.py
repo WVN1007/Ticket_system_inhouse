@@ -1,8 +1,31 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client, test_user
-from app import schemas, db_model, utils
+from app import schemas, db_model, utils, settings
 import uuid
+import jwt
+
+
+def test_login_user(test_user, client):
+    config = settings.app_config
+    res = client.post(
+        "/api/login",
+        data={
+            "username": test_user["username"],
+            "password": test_user["password"],
+        },
+    )
+    login_res = schemas.Token(**res.json())
+    payload = jwt.decode(
+        login_res.access_token,
+        config["SECRET_KEY"],
+        algorithms=[config["ALGORITHMS"]],
+    )
+    id = payload.get("uid")
+    assert uuid.UUID(id) == uuid.UUID(test_user["uid"])
+    assert login_res.token_type == "bearer"
+    assert res.status_code == 200
+
 
 def test_create_users(client):
     res = client.post(
@@ -12,11 +35,10 @@ def test_create_users(client):
             "role": "USER",
             "email": "tester@example.com",
             "password": "VerySecure",
-            # "tickets": [],
         },
     )
     res_dict = {**res.json()}
-    print("::response returned from api: ", res_dict)
+    # print("::response returned from api: ", res_dict)
     new_user = schemas.UserOut(**res.json())
     assert res.status_code == 201
     assert new_user.email == "tester@example.com"
@@ -28,14 +50,14 @@ def test_get_users(session, client, test_user):
             "username": "User1 no Tester",
             "role": "USER",
             "email": "tester1@example.com",
-            "password": utils.hash_pwd('VerySecure'),
+            "password": utils.hash_pwd("VerySecure"),
             "tickets": [],
         },
         {
             "username": "User2 no Tester",
             "role": "USER",
             "email": "tester2@example.com",
-            "password": utils.hash_pwd('VerySecure'),
+            "password": utils.hash_pwd("VerySecure"),
             "tickets": [],
         },
     ]
@@ -58,23 +80,24 @@ def test_get_single_users(client, test_user):
     res = client.get(f"/api/users/{test_user['uid']}")
     assert res.status_code == 200
     user = res.json()
-    assert user['uid'] == test_user['uid']
-    assert user['email'] == test_user['email']
+    assert user["uid"] == test_user["uid"]
+    assert user["email"] == test_user["email"]
+
 
 def test_update_single_users(client, test_user):
-    id = str(test_user['uid'])
+    id = str(test_user["uid"])
     ud = {
-        "username":test_user['username'],
+        "username": test_user["username"],
         "role": "ADMIN",
-        "email": test_user['email'], 
+        "email": test_user["email"],
     }
     res = client.put(f"/api/users/{id}", json=ud)
     assert res.status_code == 200
-    assert res.json()['role'] == 'admin'
+    assert res.json()["role"] == "admin"
 
 
-def test_delete_single_user(client,test_user):
-    id = str(test_user['uid'])
+def test_delete_single_user(client, test_user):
+    id = str(test_user["uid"])
     res = client.delete(f"/api/users/{id}")
     assert res.status_code == 204
     res = client.get(f"/api/users/{id}")
