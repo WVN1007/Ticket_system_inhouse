@@ -1,12 +1,13 @@
 """setup database data for tests"""
 
+from datetime import timedelta
 from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import URL, create_engine
-from starlette.types import StatefulLifespan
 from app.database import app_config, get_db, Base
 from app.main import app
+from app.oauth_utils import create_access_token
 
 # create a database engine
 DB_ENGINE = app_config["DB_ENGINE"]
@@ -36,7 +37,7 @@ TestingSessionLocal = sessionmaker(
 
 @pytest.fixture()
 def session():
-    """manage the test's database data for each session"""
+    """manage the test's database data for each tests session"""
     # Drop all previous tests database data
     Base.metadata.drop_all(bind=TestEngine)
     # Recreate the tables
@@ -66,6 +67,7 @@ def client(session):
 
 @pytest.fixture()
 def test_user(client):
+    """using the test client, create a test_user"""
     user = {
         "username": "User1 no fixture",
         "role": "USER",
@@ -79,8 +81,10 @@ def test_user(client):
     new_user["password"] = user["password"]
     return new_user
 
+
 @pytest.fixture()
 def test_dev(client):
+    """using the test client, create a test_staff"""
     staff = {
         "username": "Sta1 no fixture",
         "role": "STAFF",
@@ -93,3 +97,26 @@ def test_dev(client):
     new_staff = res.json()
     new_staff["password"] = staff["password"]
     return new_staff
+
+
+@pytest.fixture()
+def token_fixture(test_user):
+    """create a token for test_user"""
+    env_token_exp = app_config["ACCESS_TOKEN_EXPIRE_MINUTE"]
+    delta = timedelta(int(env_token_exp))
+    token = create_access_token(
+        data={"sub": test_user.username, "uid": test_user.uid.hex},
+        expires_delta=delta,
+    )
+    return token
+
+
+@pytest.fixture()
+def authed_client(client, token_fixture):
+    """use the created token, authorized the user"""
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token_fixture}",
+    }
+
+    return client
