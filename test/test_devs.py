@@ -1,8 +1,29 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client,test_dev
-from app import schemas, db_model, utils
+from app import schemas, db_model, utils, settings
+import uuid
+import jwt
 
+def test_login_user(test_dev, client):
+    config = settings.app_config
+    res = client.post(
+        "/api/devs/login",
+        data={
+            "username": test_dev["username"],
+            "password": test_dev["password"],
+        },
+    )
+    login_res = schemas.Token(**res.json())
+    payload = jwt.decode(
+        login_res.access_token,
+        config["SECRET_KEY"],
+        algorithms=[config["ALGORITHMS"]],
+    )
+    id = payload.get("uid")
+    assert uuid.UUID(id) == uuid.UUID(test_dev["uid"])
+    assert login_res.token_type == "bearer"
+    assert res.status_code == 200
 
 def test_create_devs(client):
     res = client.post(
