@@ -4,7 +4,8 @@ from datetime import timedelta
 from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import URL, create_engine
+from sqlalchemy import URL, create_engine, select
+from app import db_model
 from app.database import app_config, get_db, Base
 from app.main import app
 from app.oauth_utils import create_access_token
@@ -102,10 +103,10 @@ def test_dev(client):
 @pytest.fixture()
 def token_fixture(test_user):
     """create a token for test_user"""
-    env_token_exp = app_config["ACCESS_TOKEN_EXPIRE_MINUTE"]
+    env_token_exp = app_config["ACCESS_TOKEN_EXPIRE_MINUTES"]
     delta = timedelta(int(env_token_exp))
     token = create_access_token(
-        data={"sub": test_user.username, "uid": test_user.uid.hex},
+        data={"sub": test_user["username"], "uid": test_user["uid"]},
         expires_delta=delta,
     )
     return token
@@ -120,3 +121,34 @@ def authed_client(client, token_fixture):
     }
 
     return client
+
+
+@pytest.fixture()
+def test_tickets(test_user, test_dev, db: session):
+    """
+    A fixture commit tests ticket
+    created by authed user
+    and assigned to test_dev
+    """
+    in_db_user = db.execute(
+        select(db_model.User).filter_by(uid=test_user["uid"])
+    ).scalar_one_or_none()
+    in_db_dev = db.execute(
+        select(db_model.Dev).filter_by(uid=test_dev["uid"])
+    ).scalar_one_or_none()
+    tickets_data = {
+        "typ": "inc",
+        "status": "1",
+        "state": "1",
+        "severity": "1",
+        "owner_id": test_user["uid"],
+        "owner": in_db_user,
+        "assign_to_id": test_dev["uid"],
+        "assign_to": in_db_dev,
+        "description": "a test tickets created by fixtures",
+    }
+    tickets = db_model.Ticket(**tickets_data)
+    db.add(tickets)
+    db.commit()
+    db.refresh(tickets)
+    return tickets

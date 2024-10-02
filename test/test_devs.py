@@ -87,7 +87,7 @@ def test_get_single_staffs(client, test_dev):
 
 def test_update_single_dev(client, test_dev):
     id = str(test_dev["uid"])
-    print('staff_id',id)
+    print("staff_id", id)
     update = {
         "username": test_dev["username"],
         "role": "ADMIN",
@@ -95,7 +95,7 @@ def test_update_single_dev(client, test_dev):
     }
     res = client.put(f"/api/devs/{id}", json=update)
     assert res.status_code == 200
-    assert res.json()["role"] == "admin"
+    assert res.json()["role"] == "ADMIN"
 
 
 def test_delete_single_dev(client, test_dev):

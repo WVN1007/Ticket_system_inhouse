@@ -93,7 +93,7 @@ def test_update_single_users(client, test_user):
     }
     res = client.put(f"/api/users/{id}", json=ud)
     assert res.status_code == 200
-    assert res.json()["role"] == "admin"
+    assert res.json()["role"] == "ADMIN"
 
 
 def test_delete_single_user(client, test_user):
