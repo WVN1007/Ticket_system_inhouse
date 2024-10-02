@@ -1,11 +1,13 @@
 """routers to tickets data"""
 
 from enum import Enum
+from typing import Any
 from fastapi import APIRouter, status, Depends
-
-from app.database import get_db
-from app import schemas
+from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from app.database import get_db
+from app import db_model, oauth_utils, schemas
 
 
 class TicketType(str, Enum):
@@ -20,34 +22,31 @@ router = APIRouter(
 )
 
 
-# @router.get("/{type_name}")
-# async def read_tickets(type_name: TicketType):
-#     if type_name is TicketType.inc:
-#         return [{"inc_ticket_1": "inc_data_!"}, {"inc_ticket_2": "inc_data_2"}]
-#     if type_name is TicketType.ritm:
-#         return [
-#             {"ritm_ticket1": "ritm_items_!"},
-#             {"ritm_ticket2": "ritem_data_@"},
-#         ]
-#
-
-# TODO: make CRUD for tickets
-# TODO: Tasks
-# """
-# - [x] check how pydantic behave in GET method
-# - [ ] create tests data in the database to test for GET method
-# - [ ] create tests data for creating tickets
-# - [ ] create api for Post method
-# - [ ] write GET method to read from database
-# """
-
-
 @router.post(
-    "/tickets/",
-    status_code=status.HTTP_201_CREATED,
-    response_model=schemas.TicketOut,
+    "/inc", status_code=status.HTTP_201_CREATED, response_model=schemas.Ticket
 )
 async def create_ticket(
-    type_name: TicketType, ticket: schemas.TicketCreate, db: Session = Depends(get_db)
+    ticket: schemas.TicketCreate,
+    db: Session = Depends(get_db),
+    current_user: schemas.UserOut = Depends(oauth_utils.get_current_user),
 ):
-   pass 
+    """this endpoint will create a tickets from a authenticated user"""
+    new_ticket_data = ticket.model_dump()
+    try:
+        user = db.execute(
+            select(db_model.User).filter_by(uid=current_user.uid)
+        ).scalar_one_or_none()
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        new_ticket_data["owner_id"] = user.uid
+        new_ticket_data["owner"] = user
+        db_ticket = db_model.Ticket(**new_ticket_data)
+
+        db.add(db_ticket)
+        db.commit()
+        db.refresh(db_ticket)
+    except Exception as e:
+        # If there is any error why look up the user
+        print("error from endpoint:", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return db_ticket
