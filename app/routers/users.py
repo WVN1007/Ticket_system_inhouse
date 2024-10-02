@@ -37,17 +37,6 @@ async def read_users(db: Session = Depends(get_db)):
     users = db.execute(select(models.User)).scalars().all()
     return users
 
-
-# TODO: add authentication method
-
-
-# TODO: add method to get current user data
-# @router.get("/users/me")
-# async def read_current_user():
-#     """Get current logged in user"""
-#     return {"myuid": "my fakeuid"}
-
-# TODO: add authorization
 @router.put("/users/{id}", response_model=schemas.UserOut)
 async def update_user_w_id(
     id: str, update_user: schemas.UserUpdate, db: Session = Depends(get_db)
@@ -68,7 +57,6 @@ async def update_user_w_id(
     return user
 
 
-# TODO: add authorization
 @router.delete("/users/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def remove_user(id:str, db: Session = Depends(get_db)):
     '''Delete a User in the database: UNSAFE'''
