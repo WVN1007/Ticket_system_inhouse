@@ -6,41 +6,44 @@ from .database import Base
 from datetime import datetime, timezone
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import uuid
-from typing import Optional, List
+from typing import Literal, Optional, List
 
 
 # set Enum classes
-class Status(enum.Enum):
-    ACTIVE = "0"
-    NEW = "1"
-    CLOSE = "2"
+# class Status(enum.Enum):
+#     ACTIVE = "0"
+#     NEW = "1"
+#     CLOSE = "2"
 
+Status = Literal["0","1","2"]
 
-class Severity(enum.Enum):
-    LOW = "1"
-    MEDIUM = "2"
-    HIGH = "3"
+# class Severity(enum.Enum):
+#     LOW = "1"
+#     MEDIUM = "2"
+#     HIGH = "3"
+Severity = Literal["1","2","3"]
 
+# class State(enum.Enum):
+#     DRAFT = "0"
+#     SUBMITTED = "1"
+State = Literal["0","1"]
 
-class State(enum.Enum):
-    DRAFT = "0"
-    SUBMITTED = "1"
+# class Typ(enum.Enum):
+#     INC = "INC"
+#     RITM = "SR"  # change in SR
+Typ = Literal["INC","SR"]
 
+# class UserRole(enum.Enum):
+#     ADMIN = "admin"
+#     USER = "user"
+#
+UserRole = Literal["ADMIN","USER"]
 
-class Typ(enum.Enum):
-    INC = "INC"
-    RITM = "RITM"  # change in SR
+# class DevRole(enum.Enum):
+#     ADMIN = "admin"
+#     STAFF = "staff"
 
-
-class UserRole(enum.Enum):
-    ADMIN = "admin"
-    USER = "user"
-
-
-class DevRole(enum.Enum):
-    ADMIN = "admin"
-    STAFF = "staff"
-
+DevRole = Literal["ADMIN","STAFF"]
 
 class Ticket(Base):
     __tablename__ = "ticket_table"
@@ -49,22 +52,24 @@ class Ticket(Base):
     status: Mapped[Status]
     state: Mapped[State]
     severity: Mapped[Severity]
-    # one to many relationship with User
+    # one tomany relationship with User
     # when a user is deleted, the ticket still persits
     # but the owner will be set to 'NULL'
-    owner_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+    owner_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("user_table.uid", ondelete="SET NULL")
     )
-    owner: Mapped[Optional["User"]] = relationship(
-        "User", back_populates="tickets"
-    )
+    owner: Mapped["User"] = relationship("User", back_populates="tickets")
     # one to one with dev staffs
     # but set it as optional to indicate we can designate or not
-    assign_to_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("dev_table.uid", ondelete="SET NULL")
+    assign_to_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey("dev_table.uid", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
     )
-    assign_to: Mapped["Dev"] = relationship(
-        back_populates="assigned_tickets", foreign_keys=[assign_to_id]
+    assign_to: Mapped[Optional["Dev"]] = relationship(
+        back_populates="assigned_tickets",
+        foreign_keys=[assign_to_id],
+        default=None,
     )
 
     uid: Mapped[uuid.UUID] = mapped_column(
@@ -120,7 +125,7 @@ class Dev(Base):
     )
     password: Mapped[bytes]
     # set relationship with tickets
-    assigned_tickets: Mapped[List["Ticket"]] = relationship(
+    assigned_tickets: Mapped[Optional[List["Ticket"]]] = relationship(
         back_populates="assign_to"
     )
     role: Mapped[DevRole]
