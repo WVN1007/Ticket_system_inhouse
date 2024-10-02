@@ -1,7 +1,7 @@
 """schema validation using pydantic"""
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from typing import Literal, List, Optional, Union
 import uuid
 
@@ -52,6 +52,14 @@ class DevOut(BaseModel):
     assigned_tickets: Optional[list] = []
 
 
+class DevUpdate(BaseModel):
+    """Dev data just for updates"""
+
+    username: str
+    role: str
+    email: EmailStr
+
+
 class DevCreate(BaseModel):
     """Devs data for create a new dev"""
 
@@ -79,7 +87,7 @@ class TokenData(BaseModel):
 
 
 class TicketBase(BaseModel):
-    typ: Literal["INC", "RITM"]
+    typ: Literal["INC", "SR"]
     status: Literal["0", "1", "2"]
     state: Literal["0", "1"]
     severity: Literal["1", "2", "3"]
@@ -89,14 +97,11 @@ class TicketBase(BaseModel):
 class TicketCreate(TicketBase):
     pass
 
-
 class Ticket(TicketBase):
     uid: uuid.UUID
-    create_at: datetime
+    create_date: datetime
     owner_id: uuid.UUID
-    owner: UserOut
     assign_to_id: uuid.UUID | None = None
-    assign_to: DevOut | None = None
 
 
 class TicketOut(BaseModel):
