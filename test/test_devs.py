@@ -1,11 +1,12 @@
 """Tests for CRUD of Users and Devs"""
 
-from .database_fixture import session, client,test_dev
+from .database_fixture import session, client, test_dev
 from app import schemas, db_model, utils, settings
 import uuid
 import jwt
 
-def test_login_user(test_dev, client):
+
+def test_login_dev(test_dev, client):
     config = settings.app_config
     res = client.post(
         "/api/devs/login",
@@ -24,6 +25,7 @@ def test_login_user(test_dev, client):
     assert uuid.UUID(id) == uuid.UUID(test_dev["uid"])
     assert login_res.token_type == "bearer"
     assert res.status_code == 200
+
 
 def test_create_devs(client):
     res = client.post(
@@ -49,7 +51,7 @@ def test_get_staffs(session, client, test_dev):
             "username": "Staff1 no Test",
             "role": "STAFF",
             "email": "Staffmem1@example.com",
-            "password": utils.hash_pwd('VeryStaffSecure'),
+            "password": utils.hash_pwd("VeryStaffSecure"),
             "assigned_tickets": [],
         },
         {
@@ -79,5 +81,29 @@ def test_get_single_staffs(client, test_dev):
     res = client.get(f"/api/devs/{test_dev['uid']}")
     assert res.status_code == 200
     staff = res.json()
-    assert staff['uid'] == test_dev['uid']
-    assert staff['email'] == test_dev['email']
+    assert staff["uid"] == test_dev["uid"]
+    assert staff["email"] == test_dev["email"]
+
+
+def test_update_single_dev(client, test_dev):
+    id = str(test_dev["uid"])
+    print('staff_id',id)
+    update = {
+        "username": test_dev["username"],
+        "role": "ADMIN",
+        "email": test_dev["email"],
+    }
+    res = client.put(f"/api/devs/{id}", json=update)
+    assert res.status_code == 200
+    assert res.json()["role"] == "admin"
+
+
+def test_delete_single_dev(client, test_dev):
+    id = str(test_dev["uid"])
+    res = client.delete(f"/api/devs/{id}")
+    assert res.status_code == 204
+    res = client.get(f"/api/devs/{id}")
+    assert res.status_code == 404
+    fake_id = uuid.uuid4().hex
+    res = client.delete(f"/api/devs/{fake_id}")
+    assert res.status_code == 404
