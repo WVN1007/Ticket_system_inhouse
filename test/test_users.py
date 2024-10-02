@@ -105,4 +105,3 @@ def test_delete_single_user(client, test_user):
     fake_id = uuid.uuid4().hex
     res = client.delete(f"/api/users/{fake_id}")
     assert res.status_code == 404
-    res = res.status_code
