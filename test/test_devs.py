@@ -38,8 +38,8 @@ def test_create_devs(client):
             "assigned_tickets": [],
         },
     )
-    res_dict = {**res.json()}
-    print("::response returned from api: ", res_dict)
+    # res_dict = {**res.json()}
+    # print("::response returned from api: ", res_dict)
     new_staff = schemas.DevOut(**res.json())
     assert res.status_code == 201
     assert new_staff.email == "Stafmember@example.com"
@@ -87,7 +87,7 @@ def test_get_single_staffs(client, test_dev):
 
 def test_update_single_dev(client, test_dev):
     id = str(test_dev["uid"])
-    print("staff_id", id)
+    # print("staff_id", id)
     update = {
         "username": test_dev["username"],
         "role": "ADMIN",

@@ -26,5 +26,5 @@ def test_create_ticket(test_user, test_dev, authed_client):
         "description": "a test tickets created by fixtures",
     }
     res = authed_client.post("/api/tickets/inc", json=tickets_data)
-    print("debug from test:", res.json())
+    # print("debug from test:", res.json())
     assert res.status_code == 201

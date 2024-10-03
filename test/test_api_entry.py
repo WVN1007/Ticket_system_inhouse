@@ -22,7 +22,7 @@ def test_database_connection():
         DB_HOST = app_config["DB_HOST"]
         DB_NAME = app_config["DB_NAME"]
         DB_PORT = app_config["DB_PORT"]
-        print(f'{url_object}')
+        # print(f'{url_object}')
         psycopg.connect(
             host=DB_HOST,
             dbname=DB_NAME,
