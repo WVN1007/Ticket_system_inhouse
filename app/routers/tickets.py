@@ -32,16 +32,26 @@ async def create_ticket(
 ):
     """this endpoint will create a tickets from a authenticated user"""
     new_ticket_data = ticket.model_dump()
+    print(new_ticket_data)
     try:
         user = db.execute(
             select(db_model.User).filter_by(uid=current_user.uid)
         ).scalar_one_or_none()
         if user is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        dev = db.execute(
+            select(db_model.Dev).filter_by(uid=new_ticket_data["assign_to_id"])
+        ).scalar_one_or_none()
+        if dev is None:
+            raise HTTPException(
+                status_code=status.HTTP_417_EXPECTATION_FAILED,
+                detail="assigned resouce not found",
+            )
         new_ticket_data["owner_id"] = user.uid
         new_ticket_data["owner"] = user
+        new_ticket_data["assign_to_id"] = dev.uid
+        new_ticket_data["assign_to"] = dev
         db_ticket = db_model.Ticket(**new_ticket_data)
-
         db.add(db_ticket)
         db.commit()
         db.refresh(db_ticket)

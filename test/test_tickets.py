@@ -24,7 +24,11 @@ def test_create_ticket(test_user, test_dev, authed_client):
         "state": "1",
         "severity": "1",
         "description": "a test tickets created by fixtures",
+        "assign_to_id" : test_dev["uid"]
     }
     res = authed_client.post("/api/tickets/inc", json=tickets_data)
     # print("debug from test:", res.json())
     assert res.status_code == 201
+    res_data = res.json()
+    assert res_data["owner_id"] == test_user["uid"]
+    assert res_data["assign_to_id"] == test_dev["uid"]

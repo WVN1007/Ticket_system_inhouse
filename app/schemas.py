@@ -95,6 +95,7 @@ class TicketBase(BaseModel):
 
 
 class TicketCreate(TicketBase):
+    assign_to_id: uuid.UUID | None = None
     pass
 
 class Ticket(TicketBase):
