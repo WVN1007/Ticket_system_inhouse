@@ -86,7 +86,15 @@ class Ticket(Base):
     )
 
     def __repr__(self) -> str:
-        return f"TICKET(id={self.uid!r},type={self.typ!r},status={self.status!r},state={self.state!r},last_update={self.update_date!r},description={self.description!r})"
+        return f"""
+        TICKET(
+        id={self.uid!r},
+        type={self.typ!r},
+        status={self.status!r},
+        state={self.state!r},
+        create_date={self.create_date},
+        update_date={self.update_date!r},
+        description={self.description!r})"""
 
 
 class User(Base):
