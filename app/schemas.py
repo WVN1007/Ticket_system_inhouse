@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
-from typing import Literal, List, Optional, Union
+from typing import Any, Literal, List, Optional, Union
 import uuid
 
 
@@ -96,7 +96,7 @@ class TicketBase(BaseModel):
 
 class TicketCreate(TicketBase):
     assign_to_id: uuid.UUID | None = None
-    pass
+
 
 class Ticket(TicketBase):
     uid: uuid.UUID
@@ -107,4 +107,4 @@ class Ticket(TicketBase):
 
 class TicketOut(BaseModel):
     Ticket: Ticket
-    update_date: datetime
+    update_date: datetime | None = None

@@ -124,20 +124,20 @@ def authed_client(client, token_fixture):
 
 
 @pytest.fixture()
-def test_tickets(test_user, test_dev, db: session):
+def test_tickets(test_user, test_dev, session):
     """
     A fixture commit tests ticket
     created by authed user
     and assigned to test_dev
     """
-    in_db_user = db.execute(
+    in_db_user = session.execute(
         select(db_model.User).filter_by(uid=test_user["uid"])
     ).scalar_one_or_none()
-    in_db_dev = db.execute(
+    in_db_dev = session.execute(
         select(db_model.Dev).filter_by(uid=test_dev["uid"])
     ).scalar_one_or_none()
     tickets_data = {
-        "typ": "inc",
+        "typ": "INC",
         "status": "1",
         "state": "1",
         "severity": "1",
@@ -147,8 +147,21 @@ def test_tickets(test_user, test_dev, db: session):
         "assign_to": in_db_dev,
         "description": "a test tickets created by fixtures",
     }
-    tickets = db_model.Ticket(**tickets_data)
-    db.add(tickets)
-    db.commit()
-    db.refresh(tickets)
-    return tickets
+    tickets_data_2 = {
+            "typ": "INC",
+            "status": "0",
+            "state": "1",
+            "severity": "1",
+            "owner_id": test_user["uid"],
+            "owner": in_db_user,
+            "assign_to_id": test_dev["uid"],
+            "assign_to": in_db_dev,
+            "description": "another test tickets created by fixtures",
+        }
+    tickets = [db_model.Ticket(**tickets_data),db_model.Ticket(**tickets_data_2)]
+    session.add_all(tickets)
+    session.commit()
+
+    db_tickets = session.execute(select(db_model.Ticket)).all()
+    
+    return db_tickets
