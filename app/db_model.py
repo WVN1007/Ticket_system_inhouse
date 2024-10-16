@@ -88,7 +88,7 @@ class Ticket(Base):
     def __repr__(self) -> str:
         return f"""
         TICKET(
-        id={self.uid!r},
+        uid={self.uid!r},
         type={self.typ!r},
         status={self.status!r},
         state={self.state!r},
@@ -121,7 +121,7 @@ class User(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Table=User,id={self.uid.hex},role={self.role.value},username={self.username!r},email={self.email!r}"
+        return f"Table=User,id={self.uid.hex},role={self.role},username={self.username!r},email={self.email!r}"
 
 
 class Dev(Base):
@@ -143,7 +143,7 @@ class Dev(Base):
     )
 
     def __repr__(self) -> str:
-        return f"Table=Dev,id={self.uid.hex},role={self.role.value},username={self.username!r},email={self.email!r}"
+        return f"Table=Dev,id={self.uid.hex},role={self.role},username={self.username!r},email={self.email!r}"
 
 
 class Attachment(Base):
