@@ -162,6 +162,6 @@ def test_tickets(test_user, test_dev, session):
     session.add_all(tickets)
     session.commit()
 
-    db_tickets = session.execute(select(db_model.Ticket)).all()
+    db_tickets = session.execute(select(db_model.Ticket)).scalars().all()
     
     return db_tickets
