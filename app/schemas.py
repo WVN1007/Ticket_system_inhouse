@@ -1,8 +1,8 @@
 """schema validation using pydantic"""
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
-from typing import Any, Literal, List, Optional, Union
+from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import Literal, List, Optional, Union
 import uuid
 
 
@@ -103,8 +103,9 @@ class Ticket(TicketBase):
     create_date: datetime
     owner_id: uuid.UUID
     assign_to_id: uuid.UUID | None = None
+    model_config=ConfigDict(from_attributes=True)
 
 
-class TicketOut(BaseModel):
-    Ticket: Ticket
+class TicketOut(Ticket):
     update_date: datetime | None = None
+    model_config=ConfigDict(from_attributes=True)
