@@ -1,20 +1,23 @@
-import jwt
-
-from datetime import timedelta, datetime, timezone
-
-from app.database import get_db
-from . import settings, schemas, utils
-from app import db_model
-from sqlalchemy.orm import Session
-from sqlalchemy import select
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
+
+import jwt
 from fastapi import Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login",scheme_name="user_oauth2")
-oauth2_scheme_dev = OAuth2PasswordBearer(tokenUrl="/api/devs/login",scheme_name="dev_oauth2")
+from app import db_model
+from app.database import get_db
+
+from . import schemas, settings, utils
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login", scheme_name="user_oauth2")
+oauth2_scheme_dev = OAuth2PasswordBearer(
+    tokenUrl="/api/devs/login", scheme_name="dev_oauth2"
+)
 
 config = settings.app_config
 
@@ -50,7 +53,6 @@ def get_staff(usr: str, db: Session):
         role=staff_data.role.__str__(),
     )
     return user
-
 
 
 # check user authentication
@@ -132,25 +134,26 @@ async def get_current_user(
     user = get_user(usr=token_data.username, db=db)
     return user
 
+
 async def get_current_staff(
-        token: Annotated[str,Depends(oauth2_scheme_dev)], db: Session = Depends(get_db)
+    token: Annotated[str, Depends(oauth2_scheme_dev)], db: Session = Depends(get_db)
 ):
-    '''Get the current login staff'''
+    """Get the current login staff"""
     credential_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-            payload = jwt.decode(
-                token, key=config["SECRET_KEY"], algorithms=config["ALGORITHMS"]
-            )
-            username = payload.get("sub")
-            if username is None:
-                raise credential_exception
-            token_data = schemas.TokenData(username=username)
+        payload = jwt.decode(
+            token, key=config["SECRET_KEY"], algorithms=config["ALGORITHMS"]
+        )
+        username = payload.get("sub")
+        if username is None:
+            raise credential_exception
+        token_data = schemas.TokenData(username=username)
     except InvalidTokenError:
         raise credential_exception
 
-    staff = get_staff(usr=token_data.username,db=db)
+    staff = get_staff(usr=token_data.username, db=db)
     return staff

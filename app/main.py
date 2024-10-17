@@ -1,7 +1,8 @@
 """Api entry point"""
 
 from fastapi import FastAPI
-from .routers import users, tickets, devs, auth
+
+from .routers import auth, devs, tickets, users
 
 app = FastAPI()
 

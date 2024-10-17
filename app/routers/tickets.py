@@ -1,13 +1,15 @@
 """routers to tickets data"""
 
-from typing import List
 import uuid
-from fastapi import APIRouter, status, Depends
+from typing import List
+
+from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
-from sqlalchemy.orm import Session
 from sqlalchemy import select
-from app.database import get_db
+from sqlalchemy.orm import Session
+
 from app import db_model, oauth_utils, schemas
+from app.database import get_db
 
 router = APIRouter(
     prefix="/api/tickets",
@@ -16,9 +18,7 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/inc", status_code=status.HTTP_201_CREATED, response_model=schemas.Ticket
-)
+@router.post("/inc", status_code=status.HTTP_201_CREATED, response_model=schemas.Ticket)
 async def create_ticket(
     ticket: schemas.TicketCreate,
     db: Session = Depends(get_db),
@@ -67,7 +67,7 @@ async def get_tickets(
     return tickets
 
 
-@router.get("/{id}",response_model=schemas.TicketOut)
+@router.get("/{id}", response_model=schemas.TicketOut)
 async def get_ticket_w_id(
     id: str,
     db: Session = Depends(get_db),

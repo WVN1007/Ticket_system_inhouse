@@ -15,8 +15,13 @@ def hash_pwd(pwd: str | bytes):
     return hash
 
 
-# TODO: create password check method
+# create password check method
 def check_pwd(input: str, hash: bytes) -> bool:
     input_bytes = input.encode("utf-8")
 
     return bcrypt.checkpw(input_bytes, hash)
+
+
+# a method to check if the access user has the provided priviliage
+def check_priviliage():
+    return False

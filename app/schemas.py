@@ -107,5 +107,6 @@ class Ticket(TicketBase):
 
 
 class TicketOut(Ticket):
+    # Ticket: Ticket
     update_date: datetime | None = None
     model_config=ConfigDict(from_attributes=True)

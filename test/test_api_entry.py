@@ -1,21 +1,24 @@
-from fastapi import testclient
-from app.main import app
-from app.database import url_object
-from app.settings import app_config
 import psycopg
+from fastapi import testclient
 from sqlalchemy import create_engine
 
+from app.database import url_object
+from app.main import app
+from app.settings import app_config
+
 client = testclient.TestClient(app)
+
 
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"msg":"Hello World"}
+    assert response.json() == {"msg": "Hello World"}
+
 
 def test_database_connection():
-    '''
+    """
     Assert that the following conn raise no exception
-    '''
+    """
     try:
         DB_USERNAME = app_config["DB_USERNAME"]
         DB_PASS = app_config["DB_PASS"]
@@ -30,7 +33,6 @@ def test_database_connection():
             password=DB_PASS,
             port=DB_PORT,
         )
-        create_engine(url_object,echo=True)
+        create_engine(url_object, echo=True)
     except Exception as e:
         assert False, f"test_database_connection raise exception {e}"
-

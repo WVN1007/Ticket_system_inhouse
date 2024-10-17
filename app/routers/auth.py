@@ -1,18 +1,20 @@
 from datetime import timedelta
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.database import get_db
-from app.oauth_utils import (
-    get_current_user,
-    authenticate_user,
-    create_access_token,
-    authenticate_dev,
-    get_current_staff
-)
-from typing import Annotated
+
 import app.schemas as schemas
 from app import settings
+from app.database import get_db
+from app.oauth_utils import (
+    authenticate_dev,
+    authenticate_user,
+    create_access_token,
+    get_current_staff,
+    get_current_user,
+)
 
 ACCESS_TOKEN_EXPIRE_MINUTE = settings.app_config["ACCESS_TOKEN_EXPIRE_MINUTES"]
 
@@ -44,7 +46,7 @@ async def login(
 
 
 @router.post("/devs/login", response_model=schemas.Token)
-async def login(
+async def devlogin(
     formdata: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
 ):
@@ -61,7 +63,7 @@ async def login(
         )
     access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTE))
     access_token = create_access_token(
-        data={"sub": dev.username, "uid": dev.uid.hex},
+        data={"sub": dev.username, "uid": dev.uid.hex, "role": dev.role},
         expires_delta=access_token_expires,
     )
     return schemas.Token(access_token=access_token, token_type="bearer")
@@ -69,14 +71,15 @@ async def login(
 
 @router.get("/users/me", response_model=schemas.UserOut)
 async def read_user(
-    current_users: Annotated[schemas.UserOut, Depends(get_current_user)]
+    current_users: Annotated[schemas.UserOut, Depends(get_current_user)],
 ):
+    """return the current user information"""
     return current_users
+
 
 @router.get("/devs/me", response_model=schemas.DevOut)
 async def read_dev(
-    current_users: Annotated[schemas.DevOut, Depends(get_current_staff)]
+    current_users: Annotated[schemas.DevOut, Depends(get_current_staff)],
 ):
+    """return the current staff information"""
     return current_users
-
-

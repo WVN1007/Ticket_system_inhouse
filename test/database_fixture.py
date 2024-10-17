@@ -1,12 +1,14 @@
 """setup database data for tests"""
 
 from datetime import timedelta
-from fastapi.testclient import TestClient
+
 import pytest
-from sqlalchemy.orm import sessionmaker
+from fastapi.testclient import TestClient
 from sqlalchemy import URL, create_engine, select
+from sqlalchemy.orm import sessionmaker
+
 from app import db_model
-from app.database import app_config, get_db, Base
+from app.database import Base, app_config, get_db
 from app.main import app
 from app.oauth_utils import create_access_token
 
@@ -31,9 +33,7 @@ url_object = URL.create(
 )
 
 TestEngine = create_engine(url_object)
-TestingSessionLocal = sessionmaker(
-    autoflush=False, bind=TestEngine, autocommit=False
-)
+TestingSessionLocal = sessionmaker(autoflush=False, bind=TestEngine, autocommit=False)
 
 
 @pytest.fixture()
@@ -148,20 +148,20 @@ def test_tickets(test_user, test_dev, session):
         "description": "a test tickets created by fixtures",
     }
     tickets_data_2 = {
-            "typ": "INC",
-            "status": "0",
-            "state": "1",
-            "severity": "1",
-            "owner_id": test_user["uid"],
-            "owner": in_db_user,
-            "assign_to_id": test_dev["uid"],
-            "assign_to": in_db_dev,
-            "description": "another test tickets created by fixtures",
-        }
-    tickets = [db_model.Ticket(**tickets_data),db_model.Ticket(**tickets_data_2)]
+        "typ": "INC",
+        "status": "0",
+        "state": "1",
+        "severity": "1",
+        "owner_id": test_user["uid"],
+        "owner": in_db_user,
+        "assign_to_id": test_dev["uid"],
+        "assign_to": in_db_dev,
+        "description": "another test tickets created by fixtures",
+    }
+    tickets = [db_model.Ticket(**tickets_data), db_model.Ticket(**tickets_data_2)]
     session.add_all(tickets)
     session.commit()
 
     db_tickets = session.execute(select(db_model.Ticket)).scalars().all()
-    
+
     return db_tickets

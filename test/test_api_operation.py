@@ -1,10 +1,13 @@
-'''test api functionalities'''
+"""test api functionalities"""
 
-from .database_fixture import TestEngine
-from app.db_model import Base
 from sqlalchemy import MetaData
 
+from app.db_model import Base
+
+from .database_fixture import TestEngine
+
 meta = MetaData()
+
 
 def test_database_tables_creation():
     """test if all the tables are created"""

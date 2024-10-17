@@ -1,49 +1,26 @@
-""" database tables models"""
+"""database tables models"""
 
-import enum
-from sqlalchemy import ForeignKey, String
-from .database import Base
-from datetime import datetime, timezone
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 import uuid
-from typing import Literal, Optional, List
+from datetime import datetime, timezone
+from typing import List, Literal, Optional
 
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# set Enum classes
-# class Status(enum.Enum):
-#     ACTIVE = "0"
-#     NEW = "1"
-#     CLOSE = "2"
+from .database import Base
 
-Status = Literal["0","1","2"]
+Status = Literal["0", "1", "2"]
 
-# class Severity(enum.Enum):
-#     LOW = "1"
-#     MEDIUM = "2"
-#     HIGH = "3"
-Severity = Literal["1","2","3"]
+Severity = Literal["1", "2", "3"]
 
-# class State(enum.Enum):
-#     DRAFT = "0"
-#     SUBMITTED = "1"
-State = Literal["0","1"]
+State = Literal["0", "1"]
 
-# class Typ(enum.Enum):
-#     INC = "INC"
-#     RITM = "SR"  # change in SR
-Typ = Literal["INC","SR"]
+Typ = Literal["INC", "SR"]
 
-# class UserRole(enum.Enum):
-#     ADMIN = "admin"
-#     USER = "user"
-#
-UserRole = Literal["ADMIN","USER"]
+UserRole = Literal["ADMIN", "USER"]
 
-# class DevRole(enum.Enum):
-#     ADMIN = "admin"
-#     STAFF = "staff"
+DevRole = Literal["ADMIN", "STAFF"]
 
-DevRole = Literal["ADMIN","STAFF"]
 
 class Ticket(Base):
     __tablename__ = "ticket_table"
@@ -72,18 +49,12 @@ class Ticket(Base):
         default=None,
     )
 
-    uid: Mapped[uuid.UUID] = mapped_column(
-        default_factory=uuid.uuid4, primary_key=True
-    )
-    create_date: Mapped[datetime] = mapped_column(
-        default=datetime.now(timezone.utc)
-    )
+    uid: Mapped[uuid.UUID] = mapped_column(default_factory=uuid.uuid4, primary_key=True)
+    create_date: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     update_date: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc)
     )
-    description: Mapped[str] = mapped_column(
-        String, default="no description given"
-    )
+    description: Mapped[str] = mapped_column(String, default="no description given")
 
     def __repr__(self) -> str:
         return f"""
@@ -138,9 +109,7 @@ class Dev(Base):
     )
     role: Mapped[DevRole]
     email: Mapped[str] = mapped_column(String, unique=True)
-    uid: Mapped[uuid.UUID] = mapped_column(
-        default_factory=uuid.uuid4, primary_key=True
-    )
+    uid: Mapped[uuid.UUID] = mapped_column(default_factory=uuid.uuid4, primary_key=True)
 
     def __repr__(self) -> str:
         return f"Table=Dev,id={self.uid.hex},role={self.role},username={self.username!r},email={self.email!r}"
@@ -151,12 +120,8 @@ class Attachment(Base):
 
     name: Mapped[str] = mapped_column(String, nullable=False)
     path: Mapped[str] = mapped_column(String)
-    upload_date: Mapped[datetime] = mapped_column(
-        default=datetime.now(timezone.utc)
-    )
-    uid: Mapped[uuid.UUID] = mapped_column(
-        default_factory=uuid.uuid4, primary_key=True
-    )
+    upload_date: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    uid: Mapped[uuid.UUID] = mapped_column(default_factory=uuid.uuid4, primary_key=True)
 
     def __repr__(self) -> str:
         return f"Attachment(id={self.uid!r},Upload_date={self.upload_date!r},name={self.name!r},path={self.path!r})"
