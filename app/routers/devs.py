@@ -33,17 +33,8 @@ async def create_user(dev: schemas.DevCreate, db: Session = Depends(get_db)):
 @router.get("/devs/", response_model=list[schemas.DevOut])
 async def read_devs(db: Session = Depends(get_db)):
     """Get all devs, NOTE: ADMIN only"""
-    staffs = db.execute(select(models.Dev)).scalars().all() 
+    staffs = db.execute(select(models.Dev)).scalars().all()
     return staffs
-
-
-# TODO: add method to get current login staff data
-# @router.get("/devs/me")
-# async def read_current_user():
-#     """Get current logged in dev"""
-#     return {"myuid": "my fakeuid"}
-
-# TODO: add method to update staff data
 
 
 @router.get("/devs/{uid}", response_model=schemas.DevOut)
@@ -51,7 +42,7 @@ async def read_user(uid: str, db: Session = Depends(get_db)):
     id = uuid.UUID(uid)
     staff = db.execute(select(models.Dev).filter_by(uid=id)).scalar_one_or_none()
     if staff is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return staff
 
 
@@ -62,17 +53,13 @@ async def update_dev_w_id(
     """update the user with put method"""
     try:
         uid = uuid.UUID(uid)
-        dev = db.execute(
-            select(models.Dev).filter_by(uid=uid)
-        ).scalar_one_or_none()
+        dev = db.execute(select(models.Dev).filter_by(uid=uid)).scalar_one_or_none()
         if dev is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
         update_dict = dict(update_dev)
         db.execute(
-            update(models.Dev)
-            .where(models.Dev.uid == uid)
-            .values(**update_dict)
+            update(models.Dev).where(models.Dev.uid == uid).values(**update_dict)
         )
         db.commit()
         db.refresh(dev)
@@ -80,15 +67,15 @@ async def update_dev_w_id(
         raise e
     return dev
 
+
 @router.delete("/devs/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_dev(id:str, db: Session = Depends(get_db)):
-    '''Delete a Dev in the database: UNSAFE'''
+async def remove_dev(id: str, db: Session = Depends(get_db)):
+    """Delete a Dev in the database: UNSAFE"""
     uid = uuid.UUID(id)
     staff = db.execute(select(models.Dev).filter_by(uid=uid)).scalar_one_or_none()
     if staff is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    db.execute(delete(models.Dev).where(models.Dev.uid==uid))
+    db.execute(delete(models.Dev).where(models.Dev.uid == uid))
     db.commit()
-    return {"msg":"UserDeleted"}
-
+    return {"msg": "UserDeleted"}
