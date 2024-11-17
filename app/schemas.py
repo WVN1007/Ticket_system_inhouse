@@ -96,6 +96,7 @@ class TicketBase(BaseModel):
 
 class TicketCreate(TicketBase):
     assign_to_id: uuid.UUID | None = None
+    model_config=ConfigDict(from_attributes=True)
 
 
 class Ticket(TicketBase):
@@ -109,3 +110,4 @@ class Ticket(TicketBase):
 class TicketOut(Ticket):
     update_date: datetime | None = None
     model_config=ConfigDict(from_attributes=True)
+
