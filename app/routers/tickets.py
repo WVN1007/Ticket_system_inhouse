@@ -5,7 +5,7 @@ import uuid
 from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update
 from app.database import get_db
 from app import db_model, oauth_utils, schemas
 
@@ -16,9 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/inc", status_code=status.HTTP_201_CREATED, response_model=schemas.Ticket
-)
+@router.post("/inc", status_code=status.HTTP_201_CREATED, response_model=schemas.Ticket)
 async def create_ticket(
     ticket: schemas.TicketCreate,
     db: Session = Depends(get_db),
@@ -57,26 +55,37 @@ async def create_ticket(
 
 
 @router.get("/", response_model=List[schemas.TicketOut])
-async def get_tickets(
-    db: Session = Depends(get_db),
-    current_user=Depends(oauth_utils.get_current_staff)
-    or Depends(oauth_utils.get_current_user),
-):
+async def get_tickets(db: Session = Depends(get_db)):
     """this endpoints will gets ticket if the login user is authenticated"""
     tickets = db.execute(select(db_model.Ticket)).scalars().all()
     return tickets
 
 
-@router.get("/{id}",response_model=schemas.TicketOut)
-async def get_ticket_w_id(
-    id: str,
-    db: Session = Depends(get_db),
-    current_user=Depends(oauth_utils.get_current_user)
-    or Depends(oauth_utils.get_current_staff),
-):
+@router.get("/{id}", response_model=schemas.TicketOut)
+async def get_ticket_w_id(id: str, db: Session = Depends(get_db)):
     """retrieve specific ticket with id"""
     uid = uuid.UUID(id)
     ticket = db.execute(select(db_model.Ticket).filter_by(uid=uid)).scalar_one_or_none()
     if ticket is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return ticket
+
+
+@router.put("/{id}", response_model=schemas.TicketOut)
+async def update_ticket_w_id(
+    id: str, update_ticket: schemas.TicketCreate, db: Session = Depends(get_db)
+):
+    """update the ticket with put method"""
+    try:
+        uid = uuid.UUID(id)
+        ticket = db.execute(select(db_model.Ticket).filter_by(uid=uid)).scalar_one_or_none()
+        if ticket is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        update_dict = dict(update_ticket)
+        db.execute(update(db_model.Ticket).where(db_model.Ticket.uid==uid).values(**update_dict))
+        db.commit()
+        db.refresh(ticket)
+    except Exception as e:
+        raise e
     return ticket
