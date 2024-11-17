@@ -20,7 +20,7 @@ router = APIRouter(tags=["Authentication"], prefix="/api")
 
 
 @router.post("/login", response_model=schemas.Token)
-async def login(
+async def login_user(
     formdata: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
 ):
@@ -44,7 +44,7 @@ async def login(
 
 
 @router.post("/devs/login", response_model=schemas.Token)
-async def login(
+async def login_devs(
     formdata: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),
 ):
@@ -73,7 +73,7 @@ async def read_user(
 ):
     return current_users
 
-@router.get("/devs/me", response_model=schemas.DevOut)
+@router.get("/dev/me", response_model=schemas.DevOut)
 async def read_dev(
     current_users: Annotated[schemas.DevOut, Depends(get_current_staff)]
 ):
