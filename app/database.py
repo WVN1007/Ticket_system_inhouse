@@ -30,7 +30,7 @@ url_object = URL.create(
 )
 
 # create engine and sessionLocal for handling database connection
-engine = create_engine(url_object, echo=True)
+engine = create_engine(url_object, echo=False)
 SessionLocal = sessionmaker(bind=engine, autoflush=False)
 
 # create db dependencies to use sesssion
