@@ -67,7 +67,7 @@ async def login(
     return schemas.Token(access_token=access_token, token_type="bearer")
 
 
-@router.get("/users/me", response_model=schemas.UserOut)
+@router.get("/user/me", response_model=schemas.UserOut)
 async def read_user(
     current_users: Annotated[schemas.UserOut, Depends(get_current_user)]
 ):
