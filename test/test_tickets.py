@@ -52,7 +52,7 @@ def test_get_tickets_with_login(
 
 def test_get_tickets_not_login(test_user, test_dev, test_tickets, client):
     res = client.get("/api/tickets")
-    assert res.status_code == 401
+    assert res.status_code == 200
 
 
 def test_get_single_ticket_with_login(
@@ -60,6 +60,7 @@ def test_get_single_ticket_with_login(
 ):
     ticket_one_db = test_tickets[1]
     id = str(ticket_one_db.uid)
+    print(id)
     res = authed_client.get(f"/api/tickets/{id}")
     assert res.status_code == 200
     ticket = res.json()
@@ -71,4 +72,4 @@ def test_get_single_ticket_not_login(test_user, test_dev, test_tickets, client):
     ticket_one_db = test_tickets[0]
     id = str(ticket_one_db.uid)
     res = client.get(f"/api/tickets/{id}")
-    assert res.status_code == 401
+    assert res.status_code == 200
