@@ -3,8 +3,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import users, tickets, devs, auth
+from app.database import Base, engine
 
 app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
 
 origins = [
     "http://localhost",
