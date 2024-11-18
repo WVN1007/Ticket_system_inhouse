@@ -3,7 +3,8 @@ import jwt
 from datetime import timedelta, datetime, timezone
 
 from app.database import get_db
-from . import settings, schemas, utils
+from . import schemas, utils
+from .settings import SupportSecurity
 from app import db_model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -16,8 +17,10 @@ from jwt.exceptions import InvalidTokenError
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login",scheme_name="user_oauth2")
 oauth2_scheme_dev = OAuth2PasswordBearer(tokenUrl="/api/devs/login",scheme_name="dev_oauth2")
 
-config = settings.app_config
-
+# config = settings.app_config
+config ={}
+config['SECRET_KEY'] = SupportSecurity.SECRET_KEY.value
+config['ALGORITHMS'] = SupportSecurity.ALGORITHMS.value
 
 def get_user(usr: str, db: Session):
     """utility to return a user from database"""
