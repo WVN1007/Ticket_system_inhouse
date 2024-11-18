@@ -2,9 +2,9 @@ import jwt
 
 from datetime import timedelta, datetime, timezone
 
-from app.database import get_db
+from app.database import get_db, app_config
 from . import schemas, utils
-from .settings import SupportSecurity
+# from .settings import SupportSecurity
 from app import db_model
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -19,8 +19,8 @@ oauth2_scheme_dev = OAuth2PasswordBearer(tokenUrl="/api/devs/login",scheme_name=
 
 # config = settings.app_config
 config ={}
-config['SECRET_KEY'] = SupportSecurity.SECRET_KEY.value
-config['ALGORITHMS'] = SupportSecurity.ALGORITHMS.value
+config['SECRET_KEY'] = app_config['SECRET_KEY']
+config['ALGORITHMS'] = app_config['ALGORITHMS']
 
 def get_user(usr: str, db: Session):
     """utility to return a user from database"""

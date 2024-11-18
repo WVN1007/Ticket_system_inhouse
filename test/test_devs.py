@@ -1,7 +1,7 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client, test_dev
-from app import schemas, db_model, utils, settings
+from app import schemas, db_model, utils
 from app.database import app_config
 import uuid
 import jwt

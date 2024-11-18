@@ -1,13 +1,14 @@
 """Tests for CRUD of Users and Devs"""
 
 from .database_fixture import session, client, test_user
-from app import schemas, db_model, utils, settings
+from app import schemas, db_model, utils
+from app.database import app_config
 import uuid
 import jwt
 
 
 def test_login_user(test_user, client):
-    config = settings.app_config
+    config = app_config
     res = client.post(
         "/api/login",
         data={
