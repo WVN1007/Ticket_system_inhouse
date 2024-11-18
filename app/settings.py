@@ -12,8 +12,8 @@ class SupportDB(Enum):
     DB_NAME = app_config['DB_NAME'] or 'postgres'
 
 class SupportSecurity(Enum):
-    SECRET_KEY = app_config['SECRET_KEY']
-    ALGORITHMS = app_config['ALGORITHMS']
-    ACCESS_TOKEN_EXPIRE_MINUTES = app_config['ACCESS_TOKEN_EXPIRE_MINUTES']
+    SECRET_KEY = app_config['SECRET_KEY'] or "SECRET"
+    ALGORITHMS = app_config['ALGORITHMS'] or "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = app_config['ACCESS_TOKEN_EXPIRE_MINUTES'] or 15
 
 

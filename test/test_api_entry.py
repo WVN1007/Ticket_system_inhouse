@@ -1,7 +1,6 @@
 from fastapi import testclient
 from app.main import app
-from app.database import url_object
-from app.settings import app_config
+from app.database import url_object, app_config
 import psycopg
 from sqlalchemy import create_engine
 

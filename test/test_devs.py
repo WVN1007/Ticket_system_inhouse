@@ -2,12 +2,13 @@
 
 from .database_fixture import session, client, test_dev
 from app import schemas, db_model, utils, settings
+from app.database import app_config
 import uuid
 import jwt
 
 
 def test_login_dev(test_dev, client):
-    config = settings.app_config
+    config = app_config
     res = client.post(
         "/api/devs/login",
         data={

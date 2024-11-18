@@ -18,6 +18,7 @@ app_config["DB_NAME"] = SupportDB.DB_NAME.value
 app_config["DB_PORT"] = SupportDB.PORT.value
 app_config["ACCESS_TOKEN_EXPIRE_MINUTES"] = SupportSecurity.ACCESS_TOKEN_EXPIRE_MINUTES.value
 app_config["ALGORITHMS"] = SupportSecurity.ALGORITHMS.value
+app_config["SECRET_KEY"] = SupportSecurity.SECRET_KEY.value
 
 # app_config = settings.app_config
 DB_ENGINE = app_config["DB_ENGINE"]
