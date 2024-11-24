@@ -13,7 +13,7 @@ class UserOut(BaseModel):
     role: str
     email: EmailStr
     uid: uuid.UUID
-    tickets: Optional[list] = []
+    # tickets: Optional[list] = []
 
 
 class UserUpdate(BaseModel):
@@ -49,7 +49,7 @@ class DevOut(BaseModel):
     role: str
     email: EmailStr
     uid: uuid.UUID
-    assigned_tickets: Optional[list] = []
+    # assigned_tickets: Optional[list] = []
 
 
 class DevUpdate(BaseModel):
@@ -96,7 +96,7 @@ class TicketBase(BaseModel):
 
 class TicketCreate(TicketBase):
     assign_to_id: uuid.UUID | None = None
-    model_config=ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Ticket(TicketBase):
@@ -104,10 +104,9 @@ class Ticket(TicketBase):
     create_date: datetime
     owner_id: uuid.UUID
     assign_to_id: uuid.UUID | None = None
-    model_config=ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TicketOut(Ticket):
     update_date: datetime | None = None
-    model_config=ConfigDict(from_attributes=True)
-
+    model_config = ConfigDict(from_attributes=True)

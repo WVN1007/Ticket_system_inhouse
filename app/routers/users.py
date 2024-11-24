@@ -34,8 +34,14 @@ async def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @router.get("/users/", response_model=list[schemas.UserOut])
 async def read_users(db: Session = Depends(get_db)):
     """Get all users, NOTE: ADMIN only"""
-    users = db.execute(select(models.User)).scalars().all()
-    return users
+    try:
+        users = db.execute(select(models.User)).scalars().all()
+
+        return users
+    except Exception as e:
+        print(f"The application encounter errors: {e}")
+        return None
+
 
 @router.put("/users/{id}", response_model=schemas.UserOut)
 async def update_user_w_id(
@@ -47,9 +53,11 @@ async def update_user_w_id(
         user = db.execute(select(models.User).filter_by(uid=uid)).scalar_one_or_none()
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-        
+
         update_dict = dict(update_user)
-        db.execute(update(models.User).where(models.User.uid==uid).values(**update_dict))
+        db.execute(
+            update(models.User).where(models.User.uid == uid).values(**update_dict)
+        )
         db.commit()
         db.refresh(user)
     except Exception as e:
@@ -58,16 +66,17 @@ async def update_user_w_id(
 
 
 @router.delete("/users/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_user(id:str, db: Session = Depends(get_db)):
-    '''Delete a User in the database: UNSAFE'''
+async def remove_user(id: str, db: Session = Depends(get_db)):
+    """Delete a User in the database: UNSAFE"""
     uid = uuid.UUID(id)
     user = db.execute(select(models.User).filter_by(uid=uid)).scalar_one_or_none()
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    db.execute(delete(models.User).where(models.User.uid==uid))
+    db.execute(delete(models.User).where(models.User.uid == uid))
     db.commit()
-    return {"msg":"UserDeleted"}
+    return {"msg": "UserDeleted"}
+
 
 @router.get("/users/{uid}", response_model=schemas.UserOut)
 async def read_user(uid: str, db: Session = Depends(get_db)):

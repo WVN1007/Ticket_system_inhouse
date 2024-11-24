@@ -2,12 +2,17 @@
 
 from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, MappedAsDataclass
+
 # from . import settings
 from .settings import SupportDB, SupportSecurity
+
 
 # create Base object to build tables
 class Base(MappedAsDataclass, DeclarativeBase):
     """subclassing will be converted to dataclasses"""
+
+    pass
+
 
 app_config = {}
 app_config["DB_ENGINE"] = SupportDB.ENGINE.value
@@ -16,7 +21,9 @@ app_config["DB_PASS"] = SupportDB.PWD.value
 app_config["DB_HOST"] = SupportDB.HOST.value
 app_config["DB_NAME"] = SupportDB.DB_NAME.value
 app_config["DB_PORT"] = SupportDB.PORT.value
-app_config["ACCESS_TOKEN_EXPIRE_MINUTES"] = SupportSecurity.ACCESS_TOKEN_EXPIRE_MINUTES.value
+app_config["ACCESS_TOKEN_EXPIRE_MINUTES"] = (
+    SupportSecurity.ACCESS_TOKEN_EXPIRE_MINUTES.value
+)
 app_config["ALGORITHMS"] = SupportSecurity.ALGORITHMS.value
 app_config["SECRET_KEY"] = SupportSecurity.SECRET_KEY.value
 
